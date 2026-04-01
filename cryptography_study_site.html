@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cryptography Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #13161e;
+  --surface2: #1a1d28;
+  --border: #252836;
+  --border2: #2e3245;
+  --accent: #4f8ef7;
+  --accent2: #7c5af0;
+  --accent3: #2dd4b6;
+  --text: #e8eaf2;
+  --text2: #9097b8;
+  --text3: #5a6080;
+  --tag-bg: #1e2235;
+  --correct: #2dd4b6;
+  --incorrect: #f76f6f;
+  --warning: #f5a623;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* GRID LAYOUT */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.sidebar-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.sidebar-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 6px;
+}
+
+.view-switcher {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+}
+
+.vsw-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.vsw-btn:hover { border-color: var(--accent); color: var(--accent); }
+.vsw-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.nav-list {
+  list-style: none;
+  padding: 10px 0;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--surface2); }
+.nav-item.active { background: var(--surface2); border-left-color: var(--accent); }
+.nav-item.active .nav-num { color: var(--accent); }
+.nav-item.active .nav-name { color: var(--text); }
+
+.nav-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  min-width: 18px;
+}
+
+.nav-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  line-height: 1.3;
+}
+
+/* MAIN */
+.main {
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+/* HERO */
+.hero {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 56px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(79,142,247,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.hero-heading {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.hero-heading span { color: var(--accent); }
+
+.hero-desc {
+  color: var(--text2);
+  font-size: 15px;
+  max-width: 580px;
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero-tag {
+  background: var(--tag-bg);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* CONTENT AREA */
+.content-area {
+  padding: 40px 56px 80px;
+}
+
+.topic-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topic-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.topic-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.topic-subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* NOTES VIEW */
+.note-block {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.note-block-header {
+  background: var(--surface);
+  padding: 12px 18px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: background 0.15s;
+}
+.note-block-header:hover { background: var(--surface2); }
+
+.nbh-arrow {
+  font-size: 10px;
+  color: var(--text3);
+  transition: transform 0.2s;
+}
+.note-block.open .nbh-arrow { transform: rotate(180deg); }
+
+.note-block-body {
+  display: none;
+  padding: 16px 18px;
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.7;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+.note-block.open .note-block-body { display: block; }
+
+.note-block-body ul { padding-left: 20px; }
+.note-block-body li { margin-bottom: 6px; }
+
+.summary-strip {
+  background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(124,90,240,0.08));
+  border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+.summary-strip strong { color: var(--accent3); font-style: normal; }
+
+/* Q&A VIEW */
+.qa-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.qa-card:hover { border-color: var(--border2); }
+.qa-card.revealed { border-color: rgba(79,142,247,0.3); }
+
+.qa-question {
+  padding: 16px 20px;
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  user-select: none;
+}
+.qa-question:hover { background: var(--surface2); }
+
+.qa-qnum {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  min-width: 24px;
+  padding-top: 2px;
+}
+
+.qa-qtext {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.qa-reveal-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  padding-top: 3px;
+  white-space: nowrap;
+}
+
+.qa-answer {
+  display: none;
+  padding: 16px 20px 18px 58px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.qa-card.revealed .qa-answer { display: block; }
+.qa-card.revealed .qa-reveal-hint { color: var(--accent3); }
+
+.qa-answer code {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--accent3);
+}
+
+/* SUMMARY VIEW */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.sum-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.sum-card-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.sum-card-content {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  font-family: 'DM Mono', monospace;
+}
+
+/* WELCOME */
+.welcome {
+  padding: 40px 56px 80px;
+}
+
+.welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.welcome-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.welcome-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.wc-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.wc-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+/* Utility */
+.mono { font-family: 'DM Mono', monospace; }
+.hidden { display: none !important; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; }
+  .hero, .content-area, .welcome { padding: 28px 24px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .hero-heading { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Study Guide</div>
+    <div class="sidebar-title">Cryptography</div>
+    <div class="sidebar-sub">13 topics · click to explore</div>
+  </div>
+
+  <div class="view-switcher">
+    <button class="vsw-btn active" onclick="setView('notes', this)">Notes</button>
+    <button class="vsw-btn" onclick="setView('qa', this)">Q&amp;A</button>
+    <button class="vsw-btn" onclick="setView('summary', this)">Summary</button>
+  </div>
+
+  <ul class="nav-list" id="navList"></ul>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main" id="mainContent">
+  <!-- Welcome / home will be injected here -->
+</main>
+
+</div>
+
+<script>
+const DATA = [
+  {
+    short: "Intro to Cryptography",
+    subtitle: "1.1 History · 1.2 Goals · 1.3 Basic Terminology · 1.4 Applications",
+    notes: [
+      { title: "History", body: "Cryptography dates back to ~1900 BC (ancient Egypt). Julius Caesar used simple letter substitution. The Vigenère cipher (1553) dominated for centuries. WWII Enigma machine prompted Alan Turing's codebreaking at Bletchley Park. Modern era began in 1976 with Diffie &amp; Hellman's landmark public-key paper, followed by RSA (1977)." },
+      { title: "Goals (CIA + Non-repudiation)", body: "<ul><li><strong>Confidentiality</strong> — only authorised parties can read data (e.g., encrypted messages)</li><li><strong>Integrity</strong> — data has not been altered in transit (e.g., checksums)</li><li><strong>Authentication</strong> — verifying the identity of parties (e.g., passwords, certificates)</li><li><strong>Non-repudiation</strong> — sender cannot deny sending a message (e.g., digital signatures)</li></ul>" },
+      { title: "Basic Terminology", body: "<ul><li><strong>Plaintext (P)</strong> — original readable message</li><li><strong>Ciphertext (C)</strong> — encrypted, unreadable output</li><li><strong>Encryption</strong> — C = E(K, P)</li><li><strong>Decryption</strong> — P = D(K, C)</li><li><strong>Key (K)</strong> — secret parameter controlling the cipher</li><li><strong>Cipher</strong> — the algorithm for encryption/decryption</li></ul>" },
+      { title: "Applications", body: "Secure web browsing (HTTPS/TLS), email encryption (PGP/GPG), banking &amp; e-commerce, Virtual Private Networks (VPNs), digital signatures on contracts, password storage (bcrypt/Argon2), blockchain &amp; cryptocurrency, secure messaging (Signal protocol)." },
+      { title: "Kerckhoffs's Principle", body: "A cryptographic system should be secure even if everything about the system, except the key, is public knowledge. Security must NOT rely on keeping the algorithm secret (no 'security through obscurity')." }
+    ],
+    summary: "Cryptography is the science of securing information through mathematical transformations. Its four core goals are Confidentiality, Integrity, Authentication, and Non-repudiation (CIA+NR). The key is secret; the cipher algorithm is public (Kerckhoffs).",
+    sumCards: [
+      { label: "Core Goals", content: "Confidentiality · Integrity · Authentication · Non-repudiation" },
+      { label: "Key Equation", content: "Encrypt: C = E(K,P)\nDecrypt: P = D(K,C)" },
+      { label: "Timeline", content: "1900 BC → Caesar → Enigma → 1976 DH → RSA → AES (2001)" },
+      { label: "Applications", content: "HTTPS · PGP · VPN · Signatures · Blockchain · Passwords" }
+    ],
+    qa: [
+      { q: "What are the four main goals of cryptography? Give a real-world example of each.", a: "Confidentiality (e.g., encrypted WhatsApp messages — only you and the recipient can read them), Integrity (e.g., file checksums verify a download wasn't corrupted), Authentication (e.g., login with password proves who you are), Non-repudiation (e.g., a digitally signed contract that the signer cannot later deny)." },
+      { q: "A message 'HELLO' encrypts to 'KHOOR'. What cipher is used and what is the key?", a: "This is the Caesar cipher with key k = 3. Each letter is shifted 3 positions forward: H→K, E→H, L→O, L→O, O→R. Formula: C = (P + k) mod 26." },
+      { q: "Explain the difference between a cipher and a key using an analogy.", a: "A cipher is like a lock mechanism — the same design can be used by everyone. The key is the specific code that opens your particular lock. The same cipher (e.g., AES) can be used by millions with each having their own unique key." },
+      { q: "Why is it not enough to keep the cipher algorithm secret?", a: "This is 'security through obscurity'. Once the algorithm is discovered (reverse engineering, leaks), all security is gone. Kerckhoffs's principle states a system must remain secure even if everything except the key is public." },
+      { q: "Describe one historical example where breaking a cipher changed the course of history.", a: "Breaking the German Enigma cipher at Bletchley Park (1940–45) let the Allies decode German military communications, significantly shortening WWII. Alan Turing led the mathematical effort, creating the Bombe machine to find Enigma rotor settings." }
+    ]
+  },
+  {
+    short: "Classical Cryptography",
+    subtitle: "2.1 Caesar Cipher · 2.2 Vigenère Cipher · 2.3 Substitution &amp; Transposition",
+    notes: [
+      { title: "Caesar Cipher", body: "Shifts each letter by a fixed key k. Formula: C = (P + k) mod 26. Only 25 non-zero keys — trivially broken by brute force (try all 25). Example with k=3: A→D, B→E, …, Z→C. Decryption: P = (C − k) mod 26." },
+      { title: "Vigenère Cipher", body: "Uses a keyword repeated as the key stream. Each plaintext letter is shifted by the corresponding keyword letter's value. Keyword 'KEY' → K=10, E=4, Y=24. Much stronger than Caesar. Broken by <strong>Kasiski test</strong> (find repeated ciphertext sequences → reveals key length) then frequency analysis per column." },
+      { title: "Substitution Cipher", body: "Each letter replaced by a fixed (but arbitrary) different letter — a permutation of the alphabet. Key space = 26! ≈ 4×10²⁶. Despite the enormous key space, broken by <strong>frequency analysis</strong>: English E (~12.7%), T (~9.1%), A (~8.2%) are most common." },
+      { title: "Transposition Cipher", body: "Rearranges (permutes) letter positions rather than replacing them. Letters unchanged, order changed. Examples: Rail Fence cipher, Columnar transposition. Often combined with substitution to form a <strong>product cipher</strong> (both substitution and transposition)." },
+      { title: "Why Classical Ciphers Failed", body: "All classical ciphers are vulnerable to statistical attacks because natural language has predictable patterns (letter frequencies, common digraphs/trigraphs like 'TH', 'THE', 'ING'). Modern ciphers are designed to produce statistically uniform ciphertext." }
+    ],
+    summary: "Classical ciphers are historically important but insecure by modern standards. Caesar and Vigenère use letter shifting; substitution replaces letters; transposition rearranges positions. All are defeated by frequency analysis and statistical attacks on natural language patterns.",
+    sumCards: [
+      { label: "Caesar", content: "Shift by k mod 26 · Key space = 25 · Brute force" },
+      { label: "Vigenère", content: "Keyword shifts · Key space = 26^n · Kasiski test" },
+      { label: "Substitution", content: "Permutation · 26! keys · Frequency analysis" },
+      { label: "Transposition", content: "Reorder positions · Same letters · Often combined" }
+    ],
+    qa: [
+      { q: "Encrypt the word 'CRYPTO' using the Caesar cipher with key k = 7.", a: "C(2)→J(9), R(17)→Y(24), Y(24)→F(5), P(15)→W(22), T(19)→A(0), O(14)→V(21). Result: 'JYFWAV'. Formula: each letter value + 7, mod 26." },
+      { q: "You intercept 'KHOOR ZRUOG'. Using brute force on Caesar, how many attempts worst case? What's the plaintext?", a: "Maximum 25 attempts (25 non-zero shifts). Plaintext: 'HELLO WORLD' with key k=3. Each letter shifted back by 3: K→H, H→E, O→L, O→L, R→O." },
+      { q: "Explain why a substitution cipher with 26! keys is easily broken despite its huge key space.", a: "Key space size alone doesn't equal security. Frequency analysis exploits the fact that in English, 'E' appears ~12.7% of the time. The most frequent ciphertext letter is likely encrypted 'E'. Matching ciphertext letter frequencies to known English frequencies reveals the substitution mapping." },
+      { q: "A Vigenère cipher uses keyword 'CAT'. Encrypt the plaintext 'DOGRUN'.", a: "Key values: C=2, A=0, T=19, repeating → C,A,T,C,A,T. D(3)+2=F(5), O(14)+0=O(14), G(6)+19=Z(25), R(17)+2=T(19), U(20)+0=U(20), N(13)+19=G(6). Ciphertext: 'FOZTUG'." },
+      { q: "What is the Kasiski test and how does it reveal the Vigenère key length?", a: "Repeated plaintext encrypted with the same key segment produces repeated ciphertext sequences. The Kasiski test finds these repeated ciphertext blocks and measures the distances between them. The GCD of all distances is likely the key length. Each column then becomes a simple Caesar cipher solvable by frequency analysis." }
+    ]
+  },
+  {
+    short: "Mathematical Foundations I",
+    subtitle: "3.1 Modular Arithmetic · 3.2 Prime Numbers · 3.3 GCD · 3.4 Euclidean Algorithm",
+    notes: [
+      { title: "Modular Arithmetic", body: "a mod n = remainder when a is divided by n. Example: 17 mod 5 = 2. Properties: (a+b) mod n = ((a mod n)+(b mod n)) mod n. Similarly for multiplication. Used throughout cryptography to keep values in a fixed range [0, n−1]." },
+      { title: "Prime Numbers", body: "A prime p &gt; 1 has only divisors 1 and itself. <strong>Fundamental Theorem of Arithmetic</strong>: every integer has a unique prime factorisation. Primes are foundational to RSA — the product of two large primes n=pq is easy to compute but very hard to reverse (factorise). Real RSA uses primes of ~1024 bits each." },
+      { title: "GCD (Greatest Common Divisor)", body: "gcd(a,b) = largest integer dividing both a and b. gcd(12,8)=4. gcd(a,0)=a. If gcd(a,n)=1, then a and n are <strong>coprime</strong> (relatively prime). Coprimes are essential in RSA because modular inverses only exist when gcd(a,n)=1." },
+      { title: "Euclidean Algorithm", body: "Efficient GCD computation: gcd(a,b) = gcd(b, a mod b), repeated until b=0. Example: gcd(252,105) → gcd(105,42) → gcd(42,21) → gcd(21,0) = 21. <strong>Extended Euclidean Algorithm</strong>: also finds x,y such that ax+by=gcd(a,b). Used to find modular inverses (critical for RSA key generation)." },
+      { title: "Modular Inverse", body: "The modular inverse of a mod n is a value x such that a×x ≡ 1 (mod n). Only exists if gcd(a,n)=1. Found using the Extended Euclidean Algorithm. Essential for RSA decryption key d: we need d×e ≡ 1 (mod φ(n))." }
+    ],
+    summary: "Modular arithmetic keeps computations within [0, n−1]. Primes are the building blocks of public-key cryptography. GCD measures divisibility; the Euclidean algorithm computes it in O(log n) steps. Extended Euclidean finds modular inverses — the key to RSA.",
+    sumCards: [
+      { label: "Modular arithmetic", content: "a mod n = remainder · Keeps values in [0, n−1]" },
+      { label: "Primes", content: "No factors except 1 and itself · Basis of RSA · Hard to factor n=pq" },
+      { label: "GCD / Coprime", content: "gcd(a,b)=largest divisor of both · Coprime: gcd=1" },
+      { label: "Euclidean algorithm", content: "gcd(a,b)=gcd(b, a mod b) · Extended: finds mod inverses" }
+    ],
+    qa: [
+      { q: "Calculate: (1) 45 mod 7, (2) (13 × 11) mod 6, (3) 2^10 mod 5.", a: "(1) 45 = 6×7+3, so answer = 3. (2) 13×11=143, 143=23×6+5, answer = 5. (3) 2^10=1024, 1024=204×5+4, answer = 4." },
+      { q: "Use the Euclidean algorithm to find gcd(252, 105). Show every step.", a: "gcd(252,105): 252=2×105+42 → gcd(105,42): 105=2×42+21 → gcd(42,21): 42=2×21+0 → gcd(21,0)=21. Answer: gcd=21." },
+      { q: "Find the modular inverse of 3 mod 11 using the Extended Euclidean Algorithm.", a: "gcd(11,3): 11=3×3+2, 3=1×2+1. Back-substitute: 1=3−1×2=3−(11−3×3)=4×3−11. So 3×4≡1(mod 11). Inverse=4. Check: 3×4=12≡1(mod 11). ✓" },
+      { q: "Why are large prime numbers critical in modern cryptography?", a: "RSA relies on the fact that multiplying two large primes p×q takes milliseconds, but factoring n=pq back into p and q is computationally infeasible for large enough primes (e.g., 1024 bits each). No efficient factorisation algorithm for classical computers is known." },
+      { q: "Are 35 and 12 coprime? Show your working and explain why coprimes matter in cryptography.", a: "gcd(35,12): 35=2×12+11, 12=1×11+1, 11=11×1. gcd=1. Yes, they are coprime. This matters because modular inverses (needed for RSA decryption key d) only exist when gcd(e,φ(n))=1." }
+    ]
+  },
+  {
+    short: "Mathematical Foundations II",
+    subtitle: "4.1 Euler's Theorem · 4.2 Fermat's Little Theorem · 4.3 Modular Exponentiation",
+    notes: [
+      { title: "Euler's Totient Function φ(n)", body: "φ(n) = count of integers in [1,n] coprime with n. For prime p: φ(p) = p−1 (all numbers below a prime are coprime with it). For n=pq (product of two primes): φ(n) = (p−1)(q−1). This is the foundation of RSA key generation." },
+      { title: "Euler's Theorem", body: "If gcd(a,n)=1, then <strong>a^φ(n) ≡ 1 (mod n)</strong>. This allows reduction of large exponents mod φ(n). Example: a^1000 mod n can be computed as a^(1000 mod φ(n)) mod n. RSA decryption correctness relies entirely on this theorem." },
+      { title: "Fermat's Little Theorem", body: "Special case of Euler's theorem for primes: if p is prime and p∤a, then <strong>a^(p−1) ≡ 1 (mod p)</strong>. Equivalently: a^p ≡ a (mod p). Example: 2^6 ≡ 1 (mod 7). Used in primality testing (Miller-Rabin) and RSA." },
+      { title: "Square-and-Multiply Algorithm", body: "Computes a^b mod n in O(log b) multiplications. Process exponent bits left-to-right: for each bit, square current result (mod n); if bit=1, multiply by base (mod n). Without this, RSA would be impossible — direct computation of 2048-bit exponents produces numbers with millions of digits." },
+      { title: "Why These Matter for RSA", body: "RSA sets e×d ≡ 1 (mod φ(n)). By Euler's theorem: M^(φ(n)) ≡ 1 (mod n), so M^(e×d) = M^(1 + k×φ(n)) = M × (M^φ(n))^k ≡ M×1^k ≡ M (mod n). This proves RSA decryption recovers the original message." }
+    ],
+    summary: "Euler's theorem and Fermat's little theorem underpin RSA's mathematical correctness. φ(n) counts coprimes; for n=pq it equals (p−1)(q−1). Square-and-multiply makes large exponentiation feasible in O(log b) steps.",
+    sumCards: [
+      { label: "φ(n)", content: "Prime p: φ(p)=p−1 · n=pq: φ(n)=(p-1)(q-1)" },
+      { label: "Euler's theorem", content: "a^φ(n) ≡ 1 (mod n) when gcd(a,n)=1" },
+      { label: "Fermat's little theorem", content: "a^(p-1) ≡ 1 (mod p) for prime p" },
+      { label: "Mod. exponentiation", content: "Square-and-multiply · O(log b) steps · Enables RSA" }
+    ],
+    qa: [
+      { q: "Calculate φ(15), φ(17), and φ(21). Show reasoning.", a: "φ(15)=φ(3×5)=(3−1)(5−1)=2×4=8. φ(17)=17−1=16 (17 is prime). φ(21)=φ(3×7)=(3−1)(7−1)=2×6=12." },
+      { q: "Verify Fermat's Little Theorem: compute 3^6 mod 7.", a: "p=7 (prime), a=3, so FLT predicts 3^6≡1(mod 7). Verify: 3^2=9≡2, 3^3=3^2×3≡2×3=6, 3^6=(3^3)^2≡6^2=36≡1(mod 7). ✓ Confirmed." },
+      { q: "Compute 2^100 mod 13 using Fermat's Little Theorem.", a: "By FLT: 2^12≡1(mod 13). Divide: 100=8×12+4. So 2^100=(2^12)^8×2^4≡1^8×16≡16(mod 13)=3. Answer: 3." },
+      { q: "Why can't we compute a^b directly in RSA, and what is the solution?", a: "RSA uses ~2048-bit a and b values. Direct computation of a^b produces a number with ~10^600 digits — impossible to store or process. Solution: compute a^b mod n directly using the square-and-multiply algorithm, which keeps all intermediate values below n and requires only O(log b) steps." },
+      { q: "Explain square-and-multiply to compute 5^13 mod 23.", a: "13 in binary = 1101. Steps (left to right): bit 1: r=5. bit 1: r=5^2×5=125≡10(mod23). bit 0: r=10^2=100≡8(mod23). bit 1: r=8^2×5=64×5 mod23=320 mod23=320−13×23=320−299=21. Answer: 21." }
+    ]
+  },
+  {
+    short: "Symmetric Key Cryptography",
+    subtitle: "5.1 DES, 3DES · 5.2 Block &amp; Stream Ciphers · 5.3 Modes of Operation",
+    notes: [
+      { title: "DES (Data Encryption Standard)", body: "IBM design, NIST standard 1977. 64-bit block, 56-bit effective key. 16 Feistel rounds. 56-bit key = 2^56 ≈ 72 trillion keys. EFF's 'Deep Crack' machine broke DES in 22 hours (1999). Now deprecated; replaced by AES." },
+      { title: "3DES (Triple DES)", body: "Applies DES three times: C = E_K3(D_K2(E_K1(P))). The middle decryption allows backward compatibility with single DES (set K1=K2=K3). Effective security: 112 bits (2-key) or 168 bits (3-key). Much slower than AES. Still in legacy banking systems; being phased out." },
+      { title: "Block vs Stream Ciphers", body: "<ul><li><strong>Block cipher</strong>: encrypts fixed-size chunks (64 or 128 bits). Requires padding for messages not a multiple of block size. AES, DES are block ciphers.</li><li><strong>Stream cipher</strong>: generates a keystream XORed with plaintext bit-by-bit. Fast for real-time data (RC4, ChaCha20). Security depends on keystream never being reused.</li></ul>" },
+      { title: "Modes of Operation", body: "<ul><li><strong>ECB</strong>: each block independent. Insecure — same plaintext → same ciphertext, reveals patterns.</li><li><strong>CBC</strong>: C_i = E(P_i XOR C_{i-1}). Requires random IV. Most common mode.</li><li><strong>CTR</strong>: encrypts a counter, XOR with plaintext. Parallelisable. Converts block to stream cipher.</li><li><strong>GCM</strong>: CTR + Galois authentication tag. Provides Authenticated Encryption (confidentiality + integrity).</li></ul>" },
+      { title: "Why Symmetric?", body: "Symmetric ciphers use the same key for encryption and decryption. Much faster than asymmetric (thousands× faster). Used for bulk data encryption. Key distribution problem: how do two parties securely share the key? Solved by Diffie-Hellman or RSA." }
+    ],
+    summary: "Symmetric ciphers use the same key both ways. DES (56-bit) is broken; 3DES extends it temporarily. Block ciphers encrypt fixed chunks; stream ciphers go bit-by-bit. Modes of operation (ECB→CBC→CTR→GCM) determine how blocks chain — use GCM for modern applications.",
+    sumCards: [
+      { label: "DES", content: "64-bit block · 56-bit key · 16 rounds · Broken 1999" },
+      { label: "3DES", content: "E_K3(D_K2(E_K1(P))) · 112/168-bit security · Legacy" },
+      { label: "Block vs Stream", content: "Block: fixed chunks · Stream: XOR keystream bit-by-bit" },
+      { label: "Mode recommendation", content: "ECB (insecure) → CBC → CTR → GCM (best: auth+enc)" }
+    ],
+    qa: [
+      { q: "DES has a 56-bit key. At 10^9 keys/sec, how long to brute-force DES on average?", a: "2^56≈7.2×10^16 keys. On average, success at 2^55≈3.6×10^16 attempts. Time=3.6×10^16/10^9=3.6×10^7 seconds≈416 days. With parallel hardware (EFF 1999), this was done in 22 hours." },
+      { q: "Why does 2DES (double DES) provide almost no more security than single DES?", a: "The meet-in-the-middle attack: encrypt P with all 2^56 K1 values and decrypt C with all 2^56 K2 values. Match the middle results. This requires only 2^57 work and 2^56 storage instead of 2^112, so 2DES offers ~57-bit effective security — barely better than DES." },
+      { q: "Why is ECB mode considered insecure? Give a specific example.", a: "ECB encrypts each block independently. Identical plaintext blocks → identical ciphertext blocks. For an image file, the block-by-block pattern of the image remains visible in the ciphertext (the famous 'ECB penguin'). An attacker can also rearrange encrypted blocks to manipulate the plaintext without knowing the key." },
+      { q: "Compare CBC and CTR modes. Which supports parallel encryption and why?", a: "CBC: C_i=E(P_i XOR C_{i-1}) — each block depends on the previous ciphertext, so encryption must be sequential. CTR: C_i=P_i XOR E(counter_i) — each block is independent. CTR fully parallelises both encryption and decryption, making it faster on multi-core hardware." },
+      { q: "What is an IV and why must it be random and unpredictable?", a: "An Initialisation Vector is a random value used as the 'previous ciphertext block' for the first block in CBC mode (and similar). It ensures that encrypting the same plaintext twice with the same key produces different ciphertexts. If the IV is predictable, an attacker can mount chosen-plaintext attacks to detect when two messages share a common prefix." }
+    ]
+  },
+  {
+    short: "AES and Modern Block Ciphers",
+    subtitle: "6.1 Structure of AES · 6.2 Key Expansion · 6.3 Round Transformations",
+    notes: [
+      { title: "AES Overview", body: "Advanced Encryption Standard. NIST competition winner (2001), based on Rijndael by Daemen &amp; Rijmen. Block size: 128 bits. Key sizes: 128, 192, 256 bits → 10, 12, 14 rounds. Currently unbroken — best known attack reduces complexity by a factor of ~4, still completely infeasible." },
+      { title: "The AES State", body: "AES operates on a <strong>4×4 matrix of bytes</strong> (16 bytes = 128 bits) called the <em>State</em>. Plaintext is loaded column-by-column into the State at the start. All round operations transform this State. Ciphertext is read out column-by-column at the end." },
+      { title: "Round Transformations (in order)", body: "<ul><li><strong>SubBytes</strong>: each byte replaced using the AES S-box (non-linear lookup). Provides confusion. Based on GF(2^8) multiplicative inverse.</li><li><strong>ShiftRows</strong>: row i cyclic-shifted left by i positions (0,1,2,3). Provides inter-column diffusion.</li><li><strong>MixColumns</strong>: each column treated as a polynomial over GF(2^8), multiplied by a fixed matrix. Provides column diffusion. Omitted in the final round.</li><li><strong>AddRoundKey</strong>: XOR State with current round key. The only step using the key.</li></ul>" },
+      { title: "Key Expansion (Rijndael Key Schedule)", body: "The master key is expanded into (rounds+1) round keys. AES-128 → 11 × 128-bit = 1408 bits total key material. Each round key derived from the previous using SubBytes on a rotated word plus round constants (Rcon). Ensures each round has a unique key." },
+      { title: "Why AES is Secure", body: "AES achieves security through the <strong>Substitution-Permutation Network (SPN)</strong> structure. SubBytes provides non-linear confusion; ShiftRows and MixColumns together ensure every output bit depends on every input bit after a few rounds (<strong>avalanche effect</strong>). No practical attacks are known — even quantum computers provide at most a square-root speedup." }
+    ],
+    summary: "AES uses a 4×4 byte State matrix. Each round applies SubBytes (confusion) → ShiftRows → MixColumns (diffusion) → AddRoundKey. 128/192/256-bit keys give 10/12/14 rounds. The key schedule generates unique round keys. AES is the gold standard of symmetric encryption.",
+    sumCards: [
+      { label: "Key/Block sizes", content: "128-bit blocks · 128→10, 192→12, 256→14 rounds" },
+      { label: "State", content: "4×4 byte matrix · 128 bits · All ops work on this" },
+      { label: "Round ops (in order)", content: "SubBytes → ShiftRows → MixColumns → AddRoundKey" },
+      { label: "Key schedule", content: "1 master key → 11–15 round keys via Rijndael schedule" }
+    ],
+    qa: [
+      { q: "List the four AES round operations in order and state the purpose of each.", a: "1) SubBytes — non-linear S-box substitution, provides confusion. 2) ShiftRows — cyclic row shifting, provides inter-column diffusion. 3) MixColumns — matrix multiplication over GF(2^8), provides column-level diffusion. 4) AddRoundKey — XOR with round key, integrates the secret key. Final round omits MixColumns." },
+      { q: "AES-128 uses how many rounds? How many round keys are generated?", a: "AES-128 uses 10 rounds. 11 round keys are generated (one initial round key + one per round). Each is 128 bits. Total key material: 11×128=1408 bits, all derived from the original 128-bit master key." },
+      { q: "Why is AES considered secure against brute force? How long would it take to crack AES-128?", a: "AES-128 has 2^128≈3.4×10^38 keys. At 10^18 attempts/second (far beyond current capability), average time=2^127/10^18≈1.7×10^20 seconds≈5×10^12 years. That's 350 times longer than the age of the universe." },
+      { q: "What is the AES S-box and what makes it mathematically special?", a: "The AES S-box is a fixed 256-entry lookup table. Each byte is mapped to its multiplicative inverse in the finite field GF(2^8) (with 0→0), then an affine transformation is applied. This construction guarantees maximum non-linearity and provides optimal resistance to differential and linear cryptanalysis." },
+      { q: "Why does the final AES round omit MixColumns?", a: "MixColumns provides diffusion within a column but its effect on security is redundant in the final round — it would be followed immediately by AddRoundKey, and the combined transformation can be simplified. Removing it makes the inverse cipher simpler and more efficient without any reduction in security." }
+    ]
+  },
+  {
+    short: "Asymmetric Key Cryptography",
+    subtitle: "7.1 RSA Algorithm · 7.2 Key Generation · 7.3 Encryption/Decryption",
+    notes: [
+      { title: "Asymmetric Cryptography", body: "Uses a mathematically linked key pair: <strong>public key</strong> (shared freely) + <strong>private key</strong> (kept secret). Data encrypted with public key can ONLY be decrypted with private key. Solves the key distribution problem — you can publish your public key without risk." },
+      { title: "RSA Key Generation", body: "<ol style='padding-left:20px'><li>Choose two large primes <em>p</em> and <em>q</em></li><li>Compute <em>n = p × q</em> (RSA modulus)</li><li>Compute <em>φ(n) = (p−1)(q−1)</em></li><li>Choose public exponent <em>e</em>: gcd(e,φ(n))=1. Common: e=65537</li><li>Compute private key <em>d</em>: d×e ≡ 1 (mod φ(n)) via Extended Euclidean</li><li>Public key = (e, n) · Private key = (d, n)</li></ol>" },
+      { title: "RSA Encryption and Decryption", body: "<strong>Encryption:</strong> C = M^e mod n (using public key e,n)<br><strong>Decryption:</strong> M = C^d mod n (using private key d,n)<br><br>Correctness: M^(e×d) ≡ M (mod n) by Euler's theorem, since e×d ≡ 1 (mod φ(n))." },
+      { title: "RSA Security", body: "Security = hardness of <strong>integer factorisation</strong>. Given n=pq (public), finding p and q allows computing φ(n) and then d. For 2048-bit n, factorisation is computationally infeasible. Minimum recommended: 2048-bit keys (NIST). 4096-bit for long-term security." },
+      { title: "RSA Padding (OAEP)", body: "Textbook RSA is deterministic (same M always → same C) and malleable. In practice: <strong>RSA-OAEP</strong> (Optimal Asymmetric Encryption Padding) must be used for encryption; <strong>RSA-PSS</strong> for signatures. These add randomness and provide formal security proofs." }
+    ],
+    summary: "RSA uses public key (e,n) to encrypt and private key (d,n) to decrypt. Key generation requires two large primes, Euler's totient, and modular inverse. Security = integer factorisation hardness. Always use OAEP padding in practice. Minimum 2048-bit keys.",
+    sumCards: [
+      { label: "Key gen", content: "n=pq · φ(n)=(p-1)(q-1) · gcd(e,φ)=1 · d=e⁻¹ mod φ" },
+      { label: "Encrypt", content: "C = Mᵉ mod n  (public key)" },
+      { label: "Decrypt", content: "M = Cᵈ mod n  (private key)" },
+      { label: "Security", content: "Integer factorisation · 2048-bit minimum · Use OAEP padding" }
+    ],
+    qa: [
+      { q: "Generate a small RSA key pair using p=11, q=13. Show all steps.", a: "n=11×13=143. φ(n)=(11-1)(13-1)=10×12=120. Choose e=7 (gcd(7,120)=1 ✓). Find d: 7d≡1(mod 120). Extended Euclidean: 7×103=721=6×120+1, so d=103. Public key=(7,143). Private key=(103,143)." },
+      { q: "Encrypt M=9 using the public key from above (e=7, n=143).", a: "C=9^7 mod 143. 9^2=81. 9^4=81^2=6561. 6561 mod 143: 6561/143≈45.8, 45×143=6435, 6561-6435=126. 9^7=9^4×9^2×9^1=126×81×9 mod 143. 126×81=10206; 10206 mod 143: 10206/143≈71.4, 71×143=10153, 10206-10153=53. 53×9=477; 477 mod 143: 477-3×143=477-429=48. C=48." },
+      { q: "Why must RSA use padding schemes like OAEP?", a: "Textbook RSA is deterministic — identical plaintext always produces identical ciphertext, leaking information. It is also malleable: multiplying two ciphertexts C1×C2 gives the encryption of M1×M2. OAEP adds random padding before encryption, making it probabilistic and removing malleability, with a formal proof of IND-CCA2 security." },
+      { q: "If an attacker factors n=143 into p=11, q=13, what can they now do?", a: "They can compute φ(n)=(p-1)(q-1)=120. Then use the Extended Euclidean Algorithm to find d=e^{-1} mod φ(n), recovering the full private key. With d, they can decrypt any message encrypted to this key and forge digital signatures." },
+      { q: "Compare RSA and symmetric key sizes for equivalent security levels.", a: "RSA 1024-bit ≈ 80-bit symmetric (both considered weak today). RSA 2048-bit ≈ 112-bit symmetric. RSA 3072-bit ≈ 128-bit symmetric (AES-128 equivalent). RSA needs much larger keys because integer factorisation, while hard, is easier than brute-force key search — but still infeasible for 2048+ bits." }
+    ]
+  },
+  {
+    short: "Diffie-Hellman Key Exchange",
+    subtitle: "8.1 Public Key Agreement · 8.2 Vulnerabilities · 8.3 ElGamal",
+    notes: [
+      { title: "Diffie-Hellman Protocol", body: "<strong>Setup</strong>: public prime p and generator g (agreed in advance or public).<br><strong>Alice</strong>: choose secret a, compute A = g^a mod p, send A to Bob.<br><strong>Bob</strong>: choose secret b, compute B = g^b mod p, send B to Alice.<br><strong>Shared secret</strong>: Alice computes B^a mod p = g^(ab) mod p. Bob computes A^b mod p = g^(ab) mod p. Both get the same value without transmitting it!" },
+      { title: "Security: Discrete Logarithm Problem", body: "An eavesdropper sees g, p, A=g^a, B=g^b. To get the shared secret, they must solve: find a from g^a mod p. This is the <strong>Discrete Logarithm Problem (DLP)</strong> — computationally infeasible for large p. Recommended: 2048-bit p minimum. Best alternative: use ECDH with 256-bit elliptic curves." },
+      { title: "Man-in-the-Middle Attack", body: "DH provides <strong>no authentication</strong>. Mallory intercepts A and B, replaces them with her own values M1, M2. She shares separate secrets with Alice and Bob, decrypting and re-encrypting all traffic. <strong>Fix</strong>: authenticate DH values with digital signatures — Authenticated DH, TLS, or DH over certificates." },
+      { title: "ElGamal Encryption", body: "Builds asymmetric encryption on DH. <strong>Setup</strong>: public (p, g, y=g^x mod p), private x. <strong>Encrypt M</strong>: pick random k, send (g^k mod p, M×y^k mod p). <strong>Decrypt</strong>: given (c1,c2), compute c2×c1^(−x) mod p = M. Used in PGP. Ciphertext is 2× the size of the plaintext." },
+      { title: "ECDH (Elliptic Curve DH)", body: "Same DH principle but using elliptic curve groups. The elliptic curve discrete log problem is harder per bit than classical DLP. Result: 256-bit ECDH ≈ 3072-bit classical DH security. Smaller keys, faster computation, less bandwidth. Used in TLS 1.3, SSH, Signal protocol." }
+    ],
+    summary: "DH solves key distribution: two parties compute g^(ab) mod p without transmitting the secret. Security = Discrete Log hardness. DH alone is unauthenticated (MITM vulnerable). ElGamal builds encryption on DH. ECDH is the modern preferred variant — smaller keys, same security.",
+    sumCards: [
+      { label: "Protocol", content: "A=gᵃ mod p · B=gᵇ mod p · Shared: gᵃᵇ mod p" },
+      { label: "Security basis", content: "Discrete Logarithm Problem · Min 2048-bit p" },
+      { label: "Vulnerability", content: "No authentication → MITM · Fix: sign DH values" },
+      { label: "ElGamal / ECDH", content: "ElGamal: enc on DH. ECDH: 256-bit = 3072-bit DH security" }
+    ],
+    qa: [
+      { q: "Perform a complete DH exchange: p=23, g=5, Alice's a=6, Bob's b=15.", a: "Alice: A=5^6 mod 23=15625 mod 23. 15625/23≈679.3, 679×23=15617, 15625-15617=8. A=8. Bob: B=5^15 mod 23. 5^15=30517578125 mod 23. Using repeated squaring → B=19. Alice: 19^6 mod 23=2. Bob: 8^15 mod 23=2. Shared secret=2. ✓" },
+      { q: "An eavesdropper sees p=23, g=5, A=8, B=19. What must they solve?", a: "They must solve the Discrete Logarithm Problem: find a such that 5^a≡8(mod 23). For small numbers: a=6 is found by trial. For 2048-bit p, no efficient classical algorithm exists. This asymmetry — easy to compute g^a, hard to reverse — is the security foundation of DH." },
+      { q: "Describe a man-in-the-middle attack on DH. What must Mallory do?", a: "Mallory intercepts Alice→Bob channel. When Alice sends A=g^a, Mallory replaces it with M1=g^m1 and sends M1 to Bob. When Bob sends B=g^b, Mallory replaces it with M2=g^m2 to Alice. Mallory shares secret s1=g^(am1) with Alice and s2=g^(bm2) with Bob, decrypting and re-encrypting all traffic. Alice and Bob each think they're talking securely to each other." },
+      { q: "How does Authenticated DH (or TLS) prevent MITM?", a: "After the DH exchange, each party signs their DH public value with their long-term private key (e.g., RSA or ECDSA). The other verifies the signature against the sender's certificate/public key. Mallory cannot forge a valid signature without the private key, so her substituted values would fail verification." },
+      { q: "Why is ECDH preferred over classical DH in TLS 1.3?", a: "A 256-bit ECDH key provides equivalent security to a 3072-bit classical DH key. This means smaller key sizes, faster key generation and exchange, less network bandwidth, and lower CPU/memory usage. Critical for mobile devices, IoT, and high-traffic HTTPS servers." }
+    ]
+  },
+  {
+    short: "Hash Functions",
+    subtitle: "9.1 Properties · MD5 · SHA-2 · SHA-3",
+    notes: [
+      { title: "Properties of Secure Hash Functions", body: "<ul><li><strong>Pre-image resistance</strong>: given h, hard to find M where H(M)=h</li><li><strong>Second pre-image resistance</strong>: given M1, hard to find M2≠M1 with H(M1)=H(M2)</li><li><strong>Collision resistance</strong>: hard to find any M1≠M2 with H(M1)=H(M2)</li><li><strong>Deterministic</strong>: same input always produces same output</li><li><strong>Avalanche effect</strong>: 1-bit input change → ~50% of output bits change</li><li><strong>Fixed output size</strong>: regardless of input length</li></ul>" },
+      { title: "MD5", body: "128-bit output. Designed 1992. Fully broken — collision attacks demonstrated in minutes on modern hardware. Used in the 2008 rogue CA attack to forge X.509 certificates. Do NOT use for any security purpose. Only acceptable for non-adversarial checksums." },
+      { title: "SHA-2 Family", body: "SHA-224, SHA-256, SHA-384, SHA-512. Still secure. SHA-256 most widely used: Bitcoin mining/transactions, TLS 1.3 certificates, code signing, Git commit hashes. Based on Merkle–Damgård construction with Davies-Meyer compression function." },
+      { title: "SHA-3 (Keccak)", body: "NIST competition winner (2012). Completely different design from SHA-2 — uses <strong>sponge construction</strong> instead of Merkle–Damgård. Outputs: SHA3-224, SHA3-256, SHA3-384, SHA3-512. Not a replacement for SHA-2 but an alternative — provides algorithmic diversity." },
+      { title: "Birthday Attack", body: "Exploits the birthday paradox: you only need ~2^(n/2) hash computations to find a collision in an n-bit hash function. For MD5 (128-bit): 2^64 operations — feasible. For SHA-256 (256-bit): 2^128 — completely infeasible. This is why 256-bit hashes are the minimum for collision resistance." }
+    ],
+    summary: "Hash functions map arbitrary input to fixed-size output. Three key properties: pre-image, second pre-image, and collision resistance. MD5 is broken. SHA-256 is the current standard. SHA-3 uses a different sponge construction. Birthday attacks mean n-bit hashes have 2^(n/2) collision resistance.",
+    sumCards: [
+      { label: "Properties", content: "Pre-image · 2nd pre-image · Collision resistance · Avalanche" },
+      { label: "MD5", content: "128-bit · Broken · Collisions in minutes · Never use for security" },
+      { label: "SHA-256", content: "256-bit output · Secure · TLS · Bitcoin · Git · Standard" },
+      { label: "SHA-3", content: "Keccak · Sponge construction · Different design from SHA-2" }
+    ],
+    qa: [
+      { q: "Explain the difference between pre-image resistance and collision resistance with practical examples.", a: "Pre-image resistance: given hash h, cannot find any M where H(M)=h. Protects stored password hashes — attacker sees the hash but can't find your password. Collision resistance: cannot find any M1≠M2 with H(M1)=H(M2). Protects digital signatures — a collision lets an attacker forge a signature by getting you to sign a benign document whose hash matches a malicious one." },
+      { q: "Why is MD5 no longer suitable for digital certificates?", a: "In 2008, researchers demonstrated creating two different X.509 certificates with the same MD5 hash. A CA signed a certificate for a legitimate domain, but the same MD5 hash also validated a rogue CA certificate the attackers created. This compromised the entire PKI. All certificate authorities now require SHA-256 or stronger." },
+      { q: "Explain the birthday attack. How many hashes for a 50% collision chance in SHA-256?", a: "The birthday paradox shows collisions occur at ~2^(n/2) for an n-bit hash function. For SHA-256 (256-bit): approximately 2^128≈3.4×10^38 hashes needed for a 50% collision probability. At 10^18 hashes/second, this would take ~10^13 years — completely infeasible." },
+      { q: "Why is hashing passwords with SHA-256 alone insecure? What should be used instead?", a: "SHA-256 is extremely fast (~10^9 hashes/second on a GPU). Attackers precompute rainbow tables or brute-force millions of common passwords in seconds. Correct approach: use bcrypt, scrypt, or Argon2 — purpose-built key derivation functions with (1) a random per-user salt (prevents rainbow tables), (2) intentionally high computational cost (slows brute force)." },
+      { q: "A file's SHA-256 hash is published. You download the file and compute the same hash. What can you conclude and not conclude?", a: "Can conclude: the file was not accidentally corrupted or modified since the hash was published (integrity). Cannot conclude: the hash publisher is trustworthy (if the hash was also replaced, you verify against a fake), the file is free of malware (a malicious file with a published hash still matches), or who created the file (authentication requires signatures, not just hashes)." }
+    ]
+  },
+  {
+    short: "Digital Signatures",
+    subtitle: "Purpose · RSA-based Signatures · DSA-based Signatures",
+    notes: [
+      { title: "Purpose of Digital Signatures", body: "Digital signatures provide three guarantees: <strong>Authentication</strong> (proves who signed — only the private key holder could create a valid signature), <strong>Integrity</strong> (any modification invalidates the signature), and <strong>Non-repudiation</strong> (the signer cannot deny signing). <em>Note: opposite key usage to encryption — sign with private, verify with public.</em>" },
+      { title: "RSA Signature Process", body: "<strong>Signing</strong>: compute h=H(M), then sig=h^d mod n (private key d).<br><strong>Verification</strong>: compute h'=sig^e mod n (public key e), compute H(M), check h'==H(M).<br>Sign the <em>hash</em> of the message, not the message itself — handles arbitrary-length messages and is collision-resistant." },
+      { title: "RSA-PSS vs PKCS#1 v1.5", body: "<strong>PKCS#1 v1.5</strong>: deterministic padding. Has known vulnerabilities (Bleichenbacher attack). Still widely deployed for compatibility. <strong>RSA-PSS</strong> (Probabilistic Signature Scheme): randomised padding with formal security proof. Recommended for all new implementations." },
+      { title: "DSA (Digital Signature Algorithm)", body: "NIST standard (1991). Based on Discrete Log Problem. Signature = (r, s) pair. Requires a unique random k per signature. <strong>Critical flaw</strong>: reusing k for two different messages exposes the private key algebraically. Sony PS3 (2010): used a fixed k → entire signing key recovered." },
+      { title: "ECDSA and Modern Signatures", body: "<strong>ECDSA</strong>: DSA on elliptic curves. Smaller keys (256-bit = 128-bit security). Used in Bitcoin (transaction signing) and TLS certificates. <strong>EdDSA/Ed25519</strong>: modern alternative, deterministic (no random k required — k derived from private key + message). Used in SSH, Signal, modern TLS." }
+    ],
+    summary: "Digital signatures: sign with private key, verify with public key. Provide authentication, integrity, and non-repudiation. RSA-PSS is the modern standard; ECDSA/Ed25519 for efficiency. NEVER reuse k in DSA/ECDSA — it exposes the private key (Sony PS3 hack).",
+    sumCards: [
+      { label: "Three properties", content: "Authentication · Integrity · Non-repudiation" },
+      { label: "RSA signature", content: "Sign: H(M)ᵈ mod n · Verify: sigᵉ mod n == H(M)" },
+      { label: "DSA", content: "(r,s) pair · DLP-based · NEVER reuse k!" },
+      { label: "Modern", content: "ECDSA: TLS/Bitcoin · Ed25519: SSH/Signal (deterministic k)" }
+    ],
+    qa: [
+      { q: "Why do we sign the hash of a message rather than the message itself?", a: "1) RSA can only sign data smaller than the key size (e.g., 2048 bits). A document can be megabytes long. 2) Hashing gives a fixed-size 256-bit digest for any message length. 3) If H is collision-resistant, signing H(M) is as secure as signing M — a forger would need to find a hash collision to produce a different document with the same signature." },
+      { q: "You receive a document signed with Alice's private key. What three things can you verify?", a: "1) Authentication: only Alice holds her private key, so only she could have produced sig=H(M)^d mod n. 2) Integrity: recomputing H(M) and comparing with sig^e mod n confirms no byte was altered since signing. 3) Non-repudiation: Alice cannot deny signing — her private key (under her exclusive control) is the only way to produce a valid signature." },
+      { q: "The Sony PS3 used a fixed k in ECDSA. Explain mathematically why this exposed the private key.", a: "ECDSA signature: s=k^{-1}(H(M)+x·r) mod q. With the same k for two messages M1, M2: s1-s2=k^{-1}(H(M1)-H(M2)). So k=(H(M1)-H(M2))/(s1-s2) mod q. Then x=(s1·k-H(M1))/r mod q. All values on the right are publicly known. The private key x is fully exposed from just two signatures." },
+      { q: "Compare RSA-PSS and ECDSA. Which would you recommend for a new TLS certificate?", a: "RSA-PSS: large keys (2048-4096 bits), well-understood, widely compatible. ECDSA: small keys (256-bit = 128-bit security), fast signing/verification, preferred in TLS 1.3. Recommendation: ECDSA P-256 for performance-sensitive applications, or Ed25519 (EdDSA) for maximum security with deterministic signatures. RSA-PSS-2048 for maximum legacy compatibility." },
+      { q: "What is a signature replay attack and how do protocols prevent it?", a: "An attacker captures a valid signed message (e.g., a signed payment of £100) and re-submits it later to execute the same transaction again. Prevention: include a timestamp, nonce, or sequence number inside the signed message content. The signature covers the nonce, so an old signature is invalid for any new session with a different nonce." }
+    ]
+  },
+  {
+    short: "Authentication Protocols",
+    subtitle: "11.1 Challenge-Response · 11.2 Kerberos · 11.3 X.509 Certificates",
+    notes: [
+      { title: "Challenge-Response Authentication", body: "Server sends a random nonce (challenge). Client must respond with a value proving knowledge of the secret without transmitting the secret itself. Example: response = H(password ∥ nonce). Prevents: (1) eavesdropping (secret never sent), (2) replay attacks (nonce is unique each session)." },
+      { title: "Kerberos Architecture", body: "<strong>Components</strong>: KDC (Key Distribution Centre) = AS + TGS.<br><strong>Flow</strong>: 1) Client → AS: request TGT. 2) AS → Client: TGT encrypted with KDC key. 3) Client → TGS: present TGT + service request. 4) TGS → Client: service ticket. 5) Client → Service: present ticket. 6) Service grants access.<br>Used in Windows Active Directory (enterprise authentication)." },
+      { title: "X.509 Certificates", body: "Standard format for public key certificates. Binds a public key to an identity, signed by a Certificate Authority (CA). Fields: <strong>Subject</strong> (identity), <strong>Issuer</strong> (CA name), <strong>Public Key</strong>, <strong>Validity Period</strong> (not before/not after), <strong>Serial Number</strong>, <strong>Subject Alternative Names</strong> (SANs — domain names), <strong>CA Signature</strong>." },
+      { title: "Mutual Authentication", body: "Both parties authenticate each other. TLS mutual authentication: server presents certificate (always), client optionally presents certificate too. Prevents impersonation from either side. Used in enterprise systems, banking APIs, and high-security microservice architectures." },
+      { title: "Why Kerberos Uses Symmetric Crypto", body: "Kerberos was designed in 1988 for efficiency. Symmetric operations (AES) are thousands of times faster than asymmetric (RSA). Since the KDC shares secret keys with every principal, symmetric crypto is sufficient for all ticket encryption. Centralised authentication also simplifies key management." }
+    ],
+    summary: "Challenge-response proves knowledge without revealing secrets (nonce prevents replay). Kerberos provides SSO via a trusted KDC (AS+TGS). X.509 certificates bind public keys to identities, enabling the TLS trust chain. Mutual authentication verifies both parties.",
+    sumCards: [
+      { label: "Challenge-response", content: "Server: nonce N · Client: H(secret‖N) · Never sends secret" },
+      { label: "Kerberos flow", content: "AS → TGT → TGS → Service Ticket → Service" },
+      { label: "X.509 fields", content: "Subject · Issuer · Public Key · Validity · SAN · CA Signature" },
+      { label: "Used in", content: "Kerberos: Windows AD · X.509: TLS/HTTPS/Code signing" }
+    ],
+    qa: [
+      { q: "Design a simple challenge-response protocol. What prevents replay attacks?", a: "1) Client → Server: username. 2) Server → Client: random nonce N. 3) Client → Server: R=H(password ∥ N). 4) Server computes H(stored_hash ∥ N) and compares with R. Replay prevention: each session uses a fresh random N. A captured R from session 1 is useless in session 2 because N has changed and R won't match." },
+      { q: "Describe the Kerberos ticket flow in order. Why is it called single sign-on?", a: "1) Client authenticates to AS → receives TGT (encrypted, timestamped, valid for ~8h). 2) Client presents TGT to TGS → receives service-specific ticket. 3) Client presents ticket to desired service → access granted. SSO: the user authenticates once (step 1). TGT allows obtaining tickets for any service without re-entering credentials — one login, multiple services." },
+      { q: "What is an X.509 certificate? List five fields and explain each.", a: "X.509 is a CA-signed document binding identity to public key. Fields: Subject (who cert belongs to — e.g., 'www.example.com'), Issuer (which CA signed it), Public Key (entity's public key for verification/encryption), Validity Period (not before/not after dates — limits exposure if key compromised), Serial Number (unique per CA — used for revocation), CA Signature (proves CA vouches for this binding)." },
+      { q: "What attack is prevented by checking that a certificate's Subject matches the domain you're connecting to?", a: "Certificate substitution / MITM: without this check, an attacker with a valid certificate for evil.com could present it during your connection to bank.com. Since the browser doesn't verify the domain match, the fake certificate would appear 'valid'. The Common Name / Subject Alternative Name check ensures the certificate was issued for the specific domain you're visiting." },
+      { q: "Why does Kerberos use symmetric cryptography internally rather than RSA?", a: "Kerberos was designed in 1988 when public-key operations were extremely slow. Symmetric operations (AES) remain thousands of times faster than asymmetric (RSA). Since the KDC shares a unique secret key with every registered principal, symmetric crypto fully covers all authentication needs. Public-key crypto is also more complex to implement correctly (certificates, revocation)." }
+    ]
+  },
+  {
+    short: "Public Key Infrastructure",
+    subtitle: "12.1 Certificate Authorities · 12.2 Trust Models · 12.3 CRLs",
+    notes: [
+      { title: "Certificate Authorities (CAs)", body: "Trusted third parties that issue and digitally sign X.509 certificates. <strong>Hierarchy</strong>: Root CA → Intermediate CA → End-entity cert. Browsers ship with ~150 pre-trusted Root CAs (Mozilla, Google, Apple). Root CA keys are kept offline (air-gapped) — compromising a root would invalidate millions of certificates worldwide." },
+      { title: "Trust Models", body: "<ul><li><strong>Hierarchical PKI</strong>: single root CA at top, trust delegated downward. Used in web PKI (HTTPS). Simple but centralised.</li><li><strong>Web of Trust (PGP)</strong>: decentralised, users sign each other's keys. No central authority. Trust is transitive. Used in OpenPGP email encryption.</li><li><strong>Cross-certification</strong>: two separate CA hierarchies mutually certify each other. Merges two PKI domains.</li></ul>" },
+      { title: "Certificate Revocation", body: "<ul><li><strong>CRL</strong> (Certificate Revocation List): CA publishes a signed list of revoked serial numbers. Downloaded by clients. Can be stale (updated daily/weekly).</li><li><strong>OCSP</strong> (Online Certificate Status Protocol): real-time query to CA for cert status. Faster but CA sees which sites you visit.</li><li><strong>OCSP Stapling</strong>: server pre-fetches signed OCSP response, includes it in TLS handshake. Fast + privacy-preserving. Current best practice.</li></ul>" },
+      { title: "Certificate Transparency (CT)", body: "Public append-only logs of all issued certificates. Browsers require CT proofs embedded in certificates (Google Chrome). Allows rapid detection of misissuance. Detected the 2015 Symantec unauthorised certificate issuance within days." },
+      { title: "Certificate Pinning", body: "Application hard-codes the expected certificate or public key hash. Protects against MITM even if a trusted CA is compromised. Used in high-security mobile apps. Risk: if the server rotates its key, pinned apps break until updated. HPKP header (deprecated) attempted to do this for browsers." }
+    ],
+    summary: "PKI manages the lifecycle of digital certificates. CAs form a trust hierarchy (root → intermediate → end-entity). CRLs and OCSP handle revocation (OCSP Stapling is best). Trust models: hierarchical (web PKI) vs decentralised (PGP Web of Trust). Certificate Transparency provides public audit logs.",
+    sumCards: [
+      { label: "CA hierarchy", content: "Root CA → Intermediate CA → End-entity · ~150 browser roots" },
+      { label: "Trust models", content: "Hierarchical (web) · Web of Trust (PGP) · Cross-certification" },
+      { label: "Revocation", content: "CRL (stale) → OCSP (real-time) → OCSP Stapling (best)" },
+      { label: "Pinning / CT", content: "Pinning: hard-coded cert hash · CT: public certificate audit log" }
+    ],
+    qa: [
+      { q: "Explain the chain of trust from root CA to end-entity certificate. Why is the root CA kept offline?", a: "Root CA signs the Intermediate CA's certificate. Intermediate CA signs end-entity certificates (e.g., for www.example.com). Browser trusts root CA (pre-installed) → trust flows down: root→intermediate→end-entity. Root CA is offline (air-gapped) because if its private key is compromised, every certificate in its entire hierarchy becomes untrusted — an internet-wide catastrophe. Only intermediate CA keys are online for day-to-day signing." },
+      { q: "What is a CRL and describe two of its limitations.", a: "A Certificate Revocation List is a CA-signed list of revoked certificate serial numbers that clients download. Limitations: 1) Staleness — CRLs are typically updated daily or weekly. A certificate revoked at 9am may still be trusted until the next CRL is published. 2) Soft-fail — many clients accept certificates even if the CRL server is unreachable, meaning attackers can block CRL access to keep revoked certs trusted." },
+      { q: "Compare OCSP and OCSP Stapling. Which is better and why?", a: "Basic OCSP: client queries CA's OCSP server for each certificate. Problem: adds latency, CA learns which websites every user visits (privacy leak), OCSP server becomes a bottleneck/single point of failure. OCSP Stapling: web server pre-fetches the signed OCSP response and 'staples' it to the TLS handshake. Benefits: no CA privacy leak, no extra client round-trip, OCSP server unavailability doesn't break connections." },
+      { q: "In 2011, DigiNotar was compromised. What was the real-world impact?", a: "Attackers who compromised DigiNotar (a Dutch CA) issued fraudulent certificates for google.com and other major domains. Iranian users connecting to Google were silently redirected to government-controlled servers presenting these fake-but-browser-trusted certificates. Users saw padlocks and no warnings. DigiNotar was removed from all major browser trust stores within weeks and declared bankrupt. Demonstrates the catastrophic impact of a CA compromise." },
+      { q: "What is certificate pinning and what is its main operational risk?", a: "Certificate pinning hard-codes the expected certificate fingerprint or public key hash in an application. Even if a rogue CA issues a fake certificate for the server, the app rejects it because the hash doesn't match. Main risk: if the server renews its certificate or rotates its key (standard practice), the pinned app immediately rejects the new certificate and becomes non-functional — requiring an emergency app release to distribute new pins." }
+    ]
+  },
+  {
+    short: "Attacks on Cryptographic Systems",
+    subtitle: "13.1 Brute-Force · 13.2 Replay · 13.3 Chosen-Plaintext/Ciphertext Attacks",
+    notes: [
+      { title: "Brute-Force Attacks", body: "Try every possible key until correct plaintext is found. Complexity: O(2^k) for k-bit key. <strong>Defence</strong>: large key sizes. AES-128 (2^128 keys) at 10^18 attempts/second takes longer than the age of the universe. 56-bit DES was broken; 128-bit AES is safe from brute force." },
+      { title: "Replay Attacks", body: "Attacker captures a valid authentication message and retransmits it later to gain unauthorised access. Example: replay a captured TLS session token or Kerberos ticket. <strong>Defence</strong>: nonces (numbers used once), timestamps, sequence numbers — ensure each authentication transaction is unique and time-limited." },
+      { title: "Chosen-Plaintext Attack (CPA)", body: "Attacker can obtain ciphertexts for arbitrary plaintexts of their choice. Realistic in many settings: HTTPS servers, email encryption. Goal: determine the key or decrypt unknown ciphertexts. Modern ciphers must achieve <strong>IND-CPA</strong> (semantic security) — attacker cannot distinguish encryptions of two messages." },
+      { title: "Chosen-Ciphertext Attack (CCA)", body: "Attacker can also query a decryption oracle for chosen ciphertexts (except the target). <strong>CCA2 (adaptive)</strong>: can query decryption oracle even after seeing the target ciphertext. <strong>IND-CCA2</strong> is the strongest standard security notion. RSA-OAEP achieves IND-CCA2; RSA without padding does not." },
+      { title: "Side-Channel and Other Attacks", body: "<ul><li><strong>MITM</strong>: intercept and modify unauthenticated DH exchanges.</li><li><strong>Timing attacks</strong>: measure execution time to extract key bits (Kocher 1996 on RSA).</li><li><strong>Power analysis</strong>: measure power consumption of smart card during AES.</li><li><strong>Birthday attack</strong>: find hash collisions in O(2^(n/2)).</li><li><strong>Padding oracle</strong>: exploit decryption error messages to decrypt byte-by-byte (POODLE on SSL3).</li></ul>" }
+    ],
+    summary: "Attacks range from brute-force to adaptive chosen-ciphertext. Nonces and timestamps prevent replay. IND-CPA and IND-CCA2 are formal security standards for modern ciphers. Side-channel attacks bypass mathematical security through physical implementation leaks. Every layer of cryptographic design has potential attack vectors.",
+    sumCards: [
+      { label: "Brute-force", content: "Try all 2^k keys · Defeated by large keys · AES-128: safe" },
+      { label: "Replay", content: "Reuse captured message · Defence: nonces + timestamps" },
+      { label: "CPA / CCA", content: "CPA: chosen plaintexts · CCA2: + decryption oracle · Strongest: IND-CCA2" },
+      { label: "Side-channel", content: "Timing · Power · EM · Bypass math via implementation · POODLE padding oracle" }
+    ],
+    qa: [
+      { q: "AES-256 has 2^256 keys. At 10^18 attempts/second, how long is a brute-force attack?", a: "2^256≈1.16×10^77 attempts. Average success at 2^255≈5.8×10^76. Time=5.8×10^76/10^18=5.8×10^58 seconds. Age of universe≈4×10^17 seconds. This attack would take 1.45×10^41 times longer than the age of the universe. Physically impossible." },
+      { q: "Describe a chosen-plaintext attack. Which historical example used this technique against Enigma?", a: "In a CPA, the attacker chooses plaintexts and obtains their encryptions. At Bletchley Park, cryptanalysts used 'cribs' — guessing known plaintext (e.g., daily weather reports always started with 'WETTER' = weather). They encrypted their guesses through the Bombe machine and searched for Enigma configurations consistent with the observed ciphertext. This known/chosen-plaintext approach was central to breaking Enigma." },
+      { q: "What is a padding oracle attack? How does it decrypt ciphertext byte-by-byte?", a: "A padding oracle reports whether decrypted CBC plaintext has valid PKCS#7 padding. An attacker modifies the second-to-last ciphertext block byte-by-byte. When the oracle says 'valid padding', the last plaintext byte is known from the XOR relationship. Repeat for each byte to decrypt the entire block without the key. POODLE (2014) exploited this in SSL 3.0, forcing TLS downgrades to exploit it." },
+      { q: "What is a side-channel attack? Give two different types with real examples.", a: "Side-channel attacks exploit physical information leaked during computation rather than mathematical weaknesses. 1) Timing attack: Paul Kocher (1996) showed RSA implementations that don't use constant-time comparison leak private key bits through timing differences in the exponentiation. 2) Differential Power Analysis (DPA): measuring power consumption of a smart card during AES encryption correlates with the Hamming weight of intermediate values, allowing key byte extraction without ever breaking AES mathematically." },
+      { q: "You are reviewing a login system with these flaws: (a) passwords stored as MD5, (b) same IV for all CBC encryptions, (c) session tokens sent over HTTP. Identify and fix each.", a: "(a) MD5 is broken and unsalted — use Argon2id or bcrypt with a unique random salt per user. This prevents rainbow tables and slows brute force. (b) Reusing IV in CBC means identical message prefixes produce identical ciphertext — generate a fresh cryptographically random IV for every encryption operation. (c) HTTP transmits in plaintext — session tokens can be stolen by any network observer. Use HTTPS (TLS 1.2+) for all sessions, and also set cookies to Secure + HttpOnly + SameSite." }
+    ]
+  }
+];
+
+let currentTopic = null;
+let currentView = 'notes';
+
+function buildNav() {
+  const nav = document.getElementById('navList');
+  nav.innerHTML = '';
+  DATA.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.className = 'nav-item';
+    li.innerHTML = `<span class="nav-num">${String(i+1).padStart(2,'0')}</span><span class="nav-name">${t.short}</span>`;
+    li.onclick = () => loadTopic(i);
+    nav.appendChild(li);
+  });
+}
+
+function setActiveNav(idx) {
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.vsw-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (currentTopic !== null) loadTopic(currentTopic);
+  else showWelcome();
+}
+
+function loadTopic(idx) {
+  currentTopic = idx;
+  setActiveNav(idx);
+  const t = DATA[idx];
+  const main = document.getElementById('mainContent');
+
+  let html = `
+    <div class="hero">
+      <div class="hero-eyebrow">Topic ${String(idx+1).padStart(2,'0')} of 13</div>
+      <h1 class="hero-heading">${t.short.includes('Cryptography') || t.short.includes('Functions') || t.short.includes('Signatures') || t.short.includes('Protocols') || t.short.includes('Infrastructure') || t.short.includes('Attacks') ? '<span>' + t.short.split(' ')[0] + '</span> ' + t.short.split(' ').slice(1).join(' ') : '<span>' + t.short + '</span>'}</h1>
+      <p class="hero-desc">${t.subtitle}</p>
+    </div>
+    <div class="content-area">
+  `;
+
+  if (currentView === 'notes') {
+    t.notes.forEach((n, ni) => {
+      html += `
+        <div class="note-block" id="nb-${idx}-${ni}">
+          <div class="note-block-header" onclick="toggleNote('nb-${idx}-${ni}')">
+            <span>${n.title}</span>
+            <span class="nbh-arrow">▼</span>
+          </div>
+          <div class="note-block-body">${n.body}</div>
+        </div>
+      `;
+    });
+    html += `<div class="summary-strip"><strong>Summary:</strong> ${t.summary}</div>`;
+  } else if (currentView === 'qa') {
+    html += `<p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:20px;">Click any question to reveal the answer.</p>`;
+    t.qa.forEach((item, qi) => {
+      html += `
+        <div class="qa-card" id="qa-${idx}-${qi}">
+          <div class="qa-question" onclick="toggleQA('qa-${idx}-${qi}')">
+            <span class="qa-qnum">Q${qi+1}</span>
+            <span class="qa-qtext">${item.q}</span>
+            <span class="qa-reveal-hint">reveal ▾</span>
+          </div>
+          <div class="qa-answer">${item.a}</div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<div class="summary-grid">`;
+    t.sumCards.forEach(card => {
+      html += `
+        <div class="sum-card">
+          <div class="sum-card-label">${card.label}</div>
+          <div class="sum-card-content">${card.content}</div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    html += `<div class="summary-strip"><strong>One-line summary:</strong> ${t.summary}</div>`;
+  }
+
+  html += `</div>`;
+  main.innerHTML = html;
+  main.scrollTop = 0;
+}
+
+function toggleNote(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function toggleQA(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('revealed');
+}
+
+function showWelcome() {
+  const main = document.getElementById('mainContent');
+  let html = `
+    <div class="hero">
+      <div class="hero-eyebrow">Complete Study Resource</div>
+      <h1 class="hero-heading"><span>Cryptography</span> Study Guide</h1>
+      <p class="hero-desc">13 topics from classical ciphers to modern attacks. Use the sidebar to navigate topics, and toggle between Notes, Q&A flashcards, and Summary cards.</p>
+      <div class="hero-tags">
+        <span class="hero-tag">13 Topics</span>
+        <span class="hero-tag">65 Q&amp;A Pairs</span>
+        <span class="hero-tag">Short Notes</span>
+        <span class="hero-tag">Summary Cards</span>
+      </div>
+    </div>
+    <div class="welcome">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">All Topics</div>
+      <div class="welcome-grid">
+  `;
+  DATA.forEach((t, i) => {
+    html += `
+      <div class="welcome-card" onclick="loadTopic(${i})">
+        <div class="wc-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="wc-title">${t.short}</div>
+      </div>
+    `;
+  });
+  html += `</div></div>`;
+  main.innerHTML = html;
+}
+
+buildNav();
+showWelcome();
+</script>
+</body>
+</html>
